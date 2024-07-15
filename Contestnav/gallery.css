@@ -1,0 +1,142 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+    /* background-color: #0e0b2ae3; */
+}
+
+  .container {
+    padding: 20px;
+    
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+  
+}
+
+.post {
+    width: 300px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-height: fit-content;
+  
+}
+
+
+
+.user-info {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin-left: 10px;
+}
+
+.profile-pic-wrapper {
+    width: 40px;
+    height: 40px;
+    border: 2px solid red; /* Red border for the story-like effect */
+    border-radius: 50%;
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%);
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+   
+}
+
+.user-name {
+    margin-left: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.user-name a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.post-image {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    box-shadow: 0 4px 80px rgb(247, 197, 230); /* Box shadow for the image */
+    margin: 6px 0; /* Margin for the image */
+
+
+}
+
+.post-info {
+    /* display: flex; */
+    align-items: center;
+    padding: 10px;
+    margin-left:10px ;
+    font-size: medium;
+}
+
+.like-icon {
+    margin-right: 10px;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.like-icon.liked {
+    color: #e0245e; /* Red color when liked */
+}
+
+.like-count {
+    margin-right: auto;
+}
+
+.fa-paper-plane {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.fa-paper-plane:hover {
+    color: #1da1f2;
+}
+
+
+
+@media (max-width: 768px) {
+    .gallery {
+        gap: 10px;
+    }
+
+    .post {
+        width: 100%;
+    }
+
+    .post-image {
+        margin: 5px 0; /* Adjust margin for smaller screens */
+    }
+}
+
+@media (min-width: 769px) {
+    .gallery {
+        gap: 15px;
+    }
+
+    .post-image {
+        margin: 10px 0; /* Default margin for larger screens */
+    }
+}
