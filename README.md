@@ -1,2 +1,2 @@
 # MyntraHackathon
-Fashion design contest website for myntra page 
+Fashion design photo contest website for myntra page 
