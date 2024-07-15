@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contest Voting</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6bu3a0IOGT6KwVV99U7VtynFvMC90dsN0iD5HO1cA=" crossorigin="anonymous"></script>
+
+</head>
+
+
+<style>
+    .leaderboard ul {
+        list-style: none;
+        padding: 0;
+    }
+    .leaderboard img {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+</style>
+<body>
+  <header> 
+    </header>
+    <div class='leaderboard'>
+        <h1><span>Contest Leader Board</span></h1>
+        <div class="content">
+  
+      
+            <div id="popup" class="popup hidden">
+                <div class="js-container container" style="top:0px !important;">
+                <div class="popup-content">
+                    <span class="popup-close">&times;</span>
+                    <img src="partypopleft.jpg" alt="Party Popper" class="popup-icon left">
+                    <h2>Congratulations!</h2>
+                    <img src="partypopright.jpg" alt="Party Popper" class="popup-icon right">
+                    <p>The user with the highest likes is <span id="winner-name"></span></p>
+                    <img src="https://static.vecteezy.com/system/resources/previews/018/923/361/original/gold-trophy-award-png.png" alt="Trophy" class="popup-trophy">
+                </div>
+            </div></div>
+  
+
+</div>
+</div>
+<script>
+  (function ($) {
+    var FakePoller = function(options, callback){
+        var defaults = {
+            frequency: 60,
+            limit: 10
+        };
+        this.callback = callback;
+        this.config = $.extend(defaults, options);
+        this.list = [
+            {name: 'Yashi', img: '../adminpanel/user4.png'},
+            {name: 'Anusha', img: '../adminpanel/user2.png'},
+            {name: 'Kritika', img: '../adminpanel/user3.png'},
+            {name: 'Saniya', img: '../adminpanel/user1.png'},
+            {name: 'Shreya', img: '../adminpanel/user5.png'},
+        ];
+    };
+
+    FakePoller.prototype.getData = function() {
+        var results = [];
+        for (var i = 0, len = this.list.length; i < len; i++) {
+            results.push({
+                name: this.list[i].name,
+                img: this.list[i].img,
+                count: rnd(0, 1000)
+            });
+        }
+        return results;
+    };
+
+    FakePoller.prototype.processData = function() {
+        return this.sortData(this.getData()).slice(0, this.config.limit);
+    };
+
+    FakePoller.prototype.sortData = function(data) {
+        return data.sort(function(a, b) {
+            return b.count - a.count;
+        });
+    };
+
+    FakePoller.prototype.start = function() {
+        var _this = this;
+        this.interval = setInterval(function() {
+            _this.callback(_this.processData());
+        }, this.config.frequency * 1000);
+        this.callback(this.processData());
+        return this;
+    };
+
+    FakePoller.prototype.stop = function() {
+        clearInterval(this.interval);
+        return this;
+    };
+
+    window.FakePoller = FakePoller;
+
+    var Leaderboard = function (elemId, options) {
+        var _this = this;
+        var defaults = {
+            limit: 10,
+            frequency: 15
+        };
+        this.currentItem = 0;
+        this.currentCount = 0;
+        this.config = $.extend(defaults, options);
+
+        this.$elem = $(elemId);
+        if (!this.$elem.length)
+            this.$elem = $('<div>').appendTo($('body'));
+
+        this.list = [];
+        this.$content = $('<ul>');
+        this.$elem.append(this.$content);
+
+        this.poller = new FakePoller({frequency: this.config.frequency, limit: this.config.limit}, function (data) {
+            if (data) {
+                if(_this.currentCount != data.length){
+                    _this.buildElements(_this.$content, data.length);
+                }
+                _this.currentCount = data.length;
+                _this.data = data;
+                _this.list[0].$item.addClass('animate');
+            }
+        });
+
+        this.poller.start();
+    };
+
+    Leaderboard.prototype.buildElements = function($ul, elemSize){
+        var _this = this;
+        $ul.empty();
+        this.list = [];
+
+        for (var i = 0; i < elemSize; i++) {
+            var item = $('<li>')
+                .on("animationend webkitAnimationEnd oAnimationEnd", eventAnimationEnd.bind(this))
+                .appendTo($ul);
+            this.list.push({
+                $item: item,
+                $img: $('<img src="https://via.placeholder.com/40" alt="Profile Picture">').appendTo(item),
+                $name: $('<span class="name">Loading...</span>').appendTo(item),
+                $count: $('<span class="count">Loading...</span>').appendTo(item)
+            });
+        }
+
+        function eventAnimationEnd(evt) {
+            this.list[this.currentItem].$img.attr('src', _this.data[this.currentItem].img);
+            this.list[this.currentItem].$name.text(_this.data[this.currentItem].name);
+            this.list[this.currentItem].$count.text(_this.data[this.currentItem].count);
+            this.list[this.currentItem].$item.removeClass('animate');
+            this.currentItem = this.currentItem >= this.currentCount - 1 ? 0 : this.currentItem + 1;
+            if (this.currentItem != 0) {
+                this.list[this.currentItem].$item.addClass('animate');
+            }
+        }
+    };
+
+    Function.prototype.bind = function() {
+        var fn = this, args = Array.prototype.slice.call(arguments),
+            object = args.shift();
+        return function() {
+            return fn.apply(object, args.concat(Array.prototype.slice.call(arguments)));
+        };
+    };
+
+    window.Leaderboard = Leaderboard;
+
+    // Helper function to generate random number
+    function rnd(min, max) {
+        min = min || 100;
+        if (!max) {
+            max = min;
+            min = 1;
+        }
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    }
+
+    function numberFormat(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    $(document).ready(function ($) {
+        var myLeaderboard = new Leaderboard(".content", {limit: 8, frequency: 3});
+
+        // Show popup after 10 seconds and stop the poller
+        setTimeout(function() {
+            var highestLikesUser = myLeaderboard.data[0]; // Assuming the data is sorted by likes
+            $("#winner-name").text(highestLikesUser.name);
+            $("#popup").removeClass("hidden");
+            
+            // Stop the leaderboard poller when popup is shown
+            myLeaderboard.poller.stop();
+
+            // Close popup when the close button is clicked
+            $(".popup-close").click(function() {
+                $("#popup").addClass("hidden");
+            });
+        }, 10000); // 10 seconds
+    });
+})(jQuery);
+
+
+
+// confetiiiii
+const Confettiful = function(el) {
+  this.el = el;
+  this.containerEl = null;
+  
+  this.confettiFrequency = 10;
+  this.confettiColors = ['#EF2964', '#00C09D', '#2D87B0', '#48485E','#EFFF1D'];
+  this.confettiAnimations = ['slow', 'medium', 'fast'];
+  
+  this._setupElements();
+  this._renderConfetti();
+};
+
+Confettiful.prototype._setupElements = function() {
+  const containerEl = document.createElement('div');
+  const elPosition = this.el.style.position;
+  
+  if (elPosition !== 'relative' || elPosition !== 'absolute') {
+    this.el.style.position = 'relative';
+  }
+  
+  containerEl.classList.add('confetti-container');
+  
+  this.el.appendChild(containerEl);
+  
+  this.containerEl = containerEl;
+};
+
+Confettiful.prototype._renderConfetti = function() {
+  this.confettiInterval = setInterval(() => {
+    const confettiEl = document.createElement('div');
+    const confettiSize = (Math.floor(Math.random() * 3) + 7) + 'px';
+    const confettiBackground = this.confettiColors[Math.floor(Math.random() * this.confettiColors.length)];
+    const confettiLeft = (Math.floor(Math.random() * this.el.offsetWidth)) + 'px';
+    const confettiAnimation = this.confettiAnimations[Math.floor(Math.random() * this.confettiAnimations.length)];
+    
+    confettiEl.classList.add('confetti', 'confetti--animation-' + confettiAnimation);
+    confettiEl.style.left = confettiLeft;
+    confettiEl.style.width = confettiSize;
+    confettiEl.style.height = confettiSize;
+    confettiEl.style.backgroundColor = confettiBackground;
+    
+    confettiEl.removeTimeout = setTimeout(function() {
+      confettiEl.parentNode.removeChild(confettiEl);
+    }, 3000);
+    
+    this.containerEl.appendChild(confettiEl);
+  }, 25);
+};
+
+window.confettiful = new Confettiful(document.querySelector('.js-container'));
+
+
+
+</script>
+<script src="scripts.js"></script>
+</body>
+</html>
